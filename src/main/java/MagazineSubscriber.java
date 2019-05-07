@@ -7,6 +7,8 @@ public class MagazineSubscriber implements Flow.Subscriber<Integer>  {
 
     private final long sleepTime;
     private final String subscriberName;
+    private Flow.Subscription mySubcription;
+    private Integer lastItem = -1;
 
     /**
      * Construtor.
@@ -30,7 +32,8 @@ public class MagazineSubscriber implements Flow.Subscriber<Integer>  {
      * @param subscription a assinatura
      */
     public void onSubscribe(Flow.Subscription subscription) {
-       // @TODO
+       mySubcription = subscription;
+       mySubcription.request(1);
     }
 
     /**
@@ -44,7 +47,14 @@ public class MagazineSubscriber implements Flow.Subscriber<Integer>  {
      * @param item a próxima revista entregue ao assinante
      */
     public void onNext(Integer item) {
-        // @TODO
+        if (lastItem!=-1 && lastItem!=item-1){
+            for (int i=lastItem +1; i<item; i++){
+                log("I lost magazine " + i);
+            }
+        }
+        this.takeSomeRest();
+        lastItem = item;
+        mySubcription.request(1);
     }
 
     /**
@@ -62,7 +72,7 @@ public class MagazineSubscriber implements Flow.Subscriber<Integer>  {
      * Lembre-se de escrever no log a mensagem que indica quantas revistas o assinante recebeu.
      */
     public void onComplete() {
-        // @TODO
+        log("Terminei");
     }
 
     /**
